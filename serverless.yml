@@ -4,6 +4,8 @@ provider:
   name: aws
   # The AWS region in which to deploy (us-east-1 is the default)
   region: us-east-1
+  environment:
+    SQS_QUEUE: ${construct:jobs.queueUrl}
 package:
   # Files and directories to exclude from deployment
   patterns:
