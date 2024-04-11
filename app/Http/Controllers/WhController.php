@@ -13,6 +13,7 @@ use BotMan\BotMan\Interfaces\UserInterface;
 use BotMan\BotMan\Messages\Attachments\Location;
 use Geocoder\Geocoder;
 use Geocoder\Query\ReverseQuery;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class WhController extends Controller
@@ -23,7 +24,7 @@ class WhController extends Controller
         try {
             $this->handleMessage($botman, $statisticsProcessor, $geocoder);
         } catch (\Throwable $e) {
-            \Log::error($e);
+            Log::error($e);
         }
     }
 

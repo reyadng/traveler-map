@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class TgStatisticsMessage implements ShouldQueue
 {
@@ -33,7 +34,7 @@ class TgStatisticsMessage implements ShouldQueue
                 $this->botMan->reply($message);
             }
         } catch (\Exception $e) {
-            \Log::error($e);
+            Log::error($e);
         }
     }
 }
