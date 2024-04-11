@@ -12,6 +12,7 @@ return [
     */
 
     'default' => env('DYNAMODB_CONNECTION', 'aws'),
+    'table_prefix' => env('DYNAMODB_TABLE_PREFIX', ''),
 
     /*
     |--------------------------------------------------------------------------

@@ -27,6 +27,13 @@ class TgStatisticsMessage implements ShouldQueue
      */
     public function handle(StatisticsProcessor $statisticsProcessor): void
     {
-        $this->botMan->reply($statisticsProcessor->buildMessage());
+        try {
+            $message = $statisticsProcessor->buildMessage();
+            if ($message) {
+                $this->botMan->reply($message);
+            }
+        } catch (\Exception $e) {
+            \Log::error($e);
+        }
     }
 }

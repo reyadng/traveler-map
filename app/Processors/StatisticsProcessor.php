@@ -31,10 +31,12 @@ class StatisticsProcessor
             if ($lastLocation->country_code) {
                 $line .= $this->countryFlag->get($lastLocation->country_code);
                 $line .= ' ';
-            }
-            $line .= "{$lastLocation->country}";
-            if ($lastLocation->locality) {
-                $line .= ", {$lastLocation->locality}";
+                $line .= "{$lastLocation->country}";
+                if ($lastLocation->locality) {
+                    $line .= ", {$lastLocation->locality}";
+                }
+            } else {
+                $line .= '🙈 на нейтральных территориях';
             }
             $lines[] = $line;
         }

@@ -16,4 +16,10 @@ class TravelerLocation extends DynamoDbModel
         'locality',
         'country_code',
     ];
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->table = config('dynamodb.table_prefix') . 'traveler_locations';
+    }
 }

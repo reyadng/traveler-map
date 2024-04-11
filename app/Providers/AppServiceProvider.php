@@ -25,18 +25,12 @@ class AppServiceProvider extends ServiceProvider
             $this->app->register(TelescopeServiceProvider::class);
         }
 
-        $config = [
-            "telegram" => [
-                "token" => env('TELEGRAM_TOKEN')
-            ]
-        ];
-
         DriverManager::loadDriver(TelegramDriver::class);
-        $this->app->bind(BotMan::class, fn() => BotManFactory::create($config, new LaravelCache()));
+        $this->app->bind(BotMan::class, fn() => BotManFactory::create(config('botman'), new LaravelCache()));
 
         $this->app->bind(Geocoder::class, function () {
             $httpClient = new Client();
-            $provider = new Yandex($httpClient, null, env('YANDEX_API_KEY'));
+            $provider = new Yandex($httpClient, null, config('geocoder.yandex.token'));
             return new StatefulGeocoder($provider, 'ru');
         });
     }

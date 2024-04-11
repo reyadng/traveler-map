@@ -15,4 +15,10 @@ class Traveler extends DynamoDbModel
         'username',
         'traveler_location_id',
     ];
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->table = config('dynamodb.table_prefix') . 'travelers';
+    }
 }

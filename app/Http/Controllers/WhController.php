@@ -19,35 +19,12 @@ class WhController extends Controller
 {
     public function index(BotMan $botman, Geocoder $geocoder, StatisticsProcessor $statisticsProcessor)
     {
-        $botman->hears('/start', function ($bot) {
-            $chatId = $bot->getMessage()->getPayload()['chat']['id'];
-            if ($chatId < 0) {
-                return;
-            }
-            $message = 'Нажми на скрепочку и скинь мне свою локацию';
-            TgMessage::dispatch($bot, $message);
-        });
 
-        $botman->hears('', function (BotMan $bot) use ($statisticsProcessor) {
-            if ($this->isCommand($bot, '/whereiswho')) {
-                TgStatisticsMessage::dispatch($bot);
-            } elseif ($this->isCommand($bot, '/alexandro')) {
-                TgAlexandroMessage::dispatch($bot);
-            }
-
-        });
-
-        $botman->receivesLocation(function (BotMan $bot, Location $location) use ($geocoder) {
-            $chatId = $bot->getMessage()->getPayload()['chat']['id'];
-            if ($chatId < 0) {
-                return;
-            }
-            $traveler = $this->getOrCreateTraveler($bot->getUser());
-            $this->saveLocation($traveler, $location, $geocoder);
-            TgMessage::dispatch($bot, 'Сохранил');
-        });
-
-        $botman->listen();
+        try {
+            $this->handleMessage($botman, $statisticsProcessor, $geocoder);
+        } catch (\Throwable $e) {
+            \Log::error($e);
+        }
     }
 
     private function saveLocation(Traveler $traveler, Location $location, Geocoder $geocoder): void
@@ -88,5 +65,41 @@ class WhController extends Controller
         $text = $payload['text'] ?? '';
 
         return $entityType === 'bot_command' && strstr($text, $command);
+    }
+
+    /**
+     * @param BotMan $botman
+     * @param StatisticsProcessor $statisticsProcessor
+     * @param Geocoder $geocoder
+     * @return void
+     */
+    public function handleMessage(BotMan $botman, StatisticsProcessor $statisticsProcessor, Geocoder $geocoder): void
+    {
+        $botman->hears('/start', function ($bot) {
+            $chatId = $bot->getMessage()->getPayload()['chat']['id'];
+            if ($chatId < 0) {
+                return;
+            }
+            $message = 'Нажми на скрепочку и скинь мне свою локацию';
+            TgMessage::dispatch($bot, $message);
+        });
+        $botman->hears('', function (BotMan $bot) use ($statisticsProcessor) {
+            if ($this->isCommand($bot, '/whereiswho')) {
+                TgStatisticsMessage::dispatch($bot);
+            } elseif ($this->isCommand($bot, '/alexandro')) {
+                TgAlexandroMessage::dispatch($bot);
+            }
+
+        });
+        $botman->receivesLocation(function (BotMan $bot, Location $location) use ($geocoder) {
+            $chatId = $bot->getMessage()->getPayload()['chat']['id'];
+            if ($chatId < 0) {
+                return;
+            }
+            $traveler = $this->getOrCreateTraveler($bot->getUser());
+            $this->saveLocation($traveler, $location, $geocoder);
+            TgMessage::dispatch($bot, 'Сохранил');
+        });
+        $botman->listen();
     }
 }

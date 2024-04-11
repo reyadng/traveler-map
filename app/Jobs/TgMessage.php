@@ -23,8 +23,7 @@ class TgMessage implements ShouldQueue
     public function __construct(
         private readonly BotMan $botMan,
         private readonly string $message,
-    )
-    {
+    ) {
     }
 
     /**
@@ -32,6 +31,10 @@ class TgMessage implements ShouldQueue
      */
     public function handle(): void
     {
-        $this->botMan->reply($this->message);
+        try {
+            $this->botMan->reply($this->message);
+        } catch (\Exception $e) {
+            \Log::error($e);
+        }
     }
 }

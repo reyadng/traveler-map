@@ -44,12 +44,16 @@ class TgAlexandroMessage implements ShouldQueue
      */
     public function handle(): void
     {
-        $chatId = $this->botMan->getMessage()->getPayload()['chat']['id'];
-        if ($chatId) {
-            $this->botMan->sendRequest('sendSticker', [
-                'sticker' => self::STICKERS[array_rand(self::STICKERS)],
-                'chat_id' => $chatId,
-            ]);
+        try {
+            $chatId = $this->botMan->getMessage()->getPayload()['chat']['id'];
+            if ($chatId) {
+                $this->botMan->sendRequest('sendSticker', [
+                    'sticker' => self::STICKERS[array_rand(self::STICKERS)],
+                    'chat_id' => $chatId,
+                ]);
+            }
+        } catch (\Exception$e) {
+            \Log::error($e);
         }
     }
 }
