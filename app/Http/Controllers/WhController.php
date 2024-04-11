@@ -80,7 +80,7 @@ class WhController extends Controller
             if ($chatId < 0) {
                 return;
             }
-            $message = 'Нажми на скрепочку и скинь мне свою локацию';
+            $message = 'Открой телеграм на телефоне, нажми на скрепочку и скинь мне свою локацию';
             TgMessage::dispatch($bot, $message);
         });
         $botman->hears('', function (BotMan $bot) use ($statisticsProcessor) {
