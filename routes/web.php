@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\TestController;
 use App\Http\Controllers\WhController;
 use App\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Support\Facades\Route;
@@ -16,6 +15,5 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('/wh', [WhController::class, 'index'])
+Route::post('/lsmcbwlkeuyfbcdlkbsdjk', [WhController::class, 'index'])
     ->withoutMiddleware(VerifyCsrfToken::class);
-Route::get('/test', [TestController::class, 'index']);
