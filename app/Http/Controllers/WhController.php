@@ -8,21 +8,22 @@ use App\Jobs\TgStatisticsMessage;
 use App\Models\Traveler;
 use App\Models\TravelerLocation;
 use App\Processors\StatisticsProcessor;
+use App\Processors\TgCallback;
 use BotMan\BotMan\BotMan;
 use BotMan\BotMan\Interfaces\UserInterface;
 use BotMan\BotMan\Messages\Attachments\Location;
 use Geocoder\Geocoder;
 use Geocoder\Query\ReverseQuery;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class WhController extends Controller
 {
-    public function index(BotMan $botman, Geocoder $geocoder, StatisticsProcessor $statisticsProcessor)
+    public function index(Request $request, BotMan $botman, Geocoder $geocoder, StatisticsProcessor $statisticsProcessor, TgCallback $tgCallback)
     {
-
         try {
-            $this->handleMessage($botman, $statisticsProcessor, $geocoder);
+            $this->handleMessage($request, $botman, $statisticsProcessor, $geocoder, $tgCallback);
         } catch (\Throwable $e) {
             Log::error($e);
         }
@@ -74,8 +75,24 @@ class WhController extends Controller
      * @param Geocoder $geocoder
      * @return void
      */
-    public function handleMessage(BotMan $botman, StatisticsProcessor $statisticsProcessor, Geocoder $geocoder): void
+    public function handleMessage(Request $request, BotMan $botman, StatisticsProcessor $statisticsProcessor, Geocoder $geocoder, TgCallback $tgCallback): void
     {
+        $data = $request->all();
+        $callbackDataPayload = $data['callback_query']['data'] ?? null;
+        if ($callbackDataPayload) {
+            $callbackData = $tgCallback->generateCallbackDataFromPayload($callbackDataPayload);
+        }
+        $callbackCmd = $callbackData['cmd'] ?? null;
+
+        if ($callbackCmd === 'stats') {
+            TgStatisticsMessage::dispatch(
+                $botman,
+                $data['callback_query']['message']['chat']['id'],
+                $data['callback_query']['message']['message_id'],
+                $callbackData['payload']
+            );
+            return;
+        }
         $botman->hears('/start', function ($bot) {
             $chatId = $bot->getMessage()->getPayload()['chat']['id'];
             if ($chatId < 0) {
@@ -84,9 +101,9 @@ class WhController extends Controller
             $message = 'Открой телеграм на телефоне, нажми на скрепочку и скинь мне свою локацию';
             TgMessage::dispatch($bot, $message);
         });
-        $botman->hears('', function (BotMan $bot) use ($statisticsProcessor) {
+        $botman->hears('', function (BotMan $bot) use ($data) {
             if ($this->isCommand($bot, '/whereiswho')) {
-                TgStatisticsMessage::dispatch($bot);
+                TgStatisticsMessage::dispatch($bot, $data['message']['chat']['id']);
             } elseif ($this->isCommand($bot, '/alexandro')) {
                 TgAlexandroMessage::dispatch($bot);
             }
