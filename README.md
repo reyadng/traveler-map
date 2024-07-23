@@ -5,6 +5,5 @@
 Точка входа: app/Http/Controllers/WhController.php
 
 
-Выглядит это примерно так
 ![image](https://github.com/user-attachments/assets/23427857-aef4-4972-af2b-3da4dad53185)
 
